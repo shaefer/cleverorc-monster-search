@@ -1,0 +1,10 @@
+{
+  "name": "cleverorc-monster-search",
+  "version": "1.0.0",
+  "description": "lambda using S3 Select accessed via Rest",
+  "author": "daniel shaefer",
+  "license": "MIT",
+  "dependencies": {
+    "aws-sdk": "^2.683.0"
+  }
+}
