@@ -20,7 +20,7 @@ If you are looking for a first-time guide to serverless and lambda's please chec
     - **Understand the document we are querying against and the query we are using**
         - Look at `serverless.yml` for the definitions of things going into AWS. 
         - Make sure to check `service`, `region`, and `stage` on the provider entry in `serverless.yml` to your desired otherwise you'll deploy to `us-west-2` and the stage will be named `dev` The first time you create all this in AWS you probably should go look through everything that got created. It is all happening with CloudFormation and it is doing a lot of nice things for you and all the names and such are coming from the serverless.yml file and are under your control.
-1. Run it locally `serverless invoke local --function s3SelectQuery` This is like hitting your lambda live with the earlier mentioned URI. 
+1. Run it locally `serverless invoke local --function monsterSearch --path test/shaefer/getCR15.json` This is like hitting your lambda live with the earlier mentioned URI. 
 1. Run `serverless deploy` to create the lambda and dynamodb table in AWS. The output for the deploy will show success and give you the url for the deployed API gateway endpoint that you can hit to test it live.
 1. *OPTIONAL BUT IMPORTANT*: If you forgot something and want to rollback...**BEFORE** you change anything in the serverless.yml just run a `serverless remove` and it will delete all the resources it just created...or try to. Since serverless created everything with Cloudformation it can remove it too. Find more details in the [serverless docs](https://www.serverless.com/framework/docs/providers/aws/cli-reference/remove/).
 

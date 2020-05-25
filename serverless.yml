@@ -13,11 +13,11 @@ provider:
       Resource: "arn:aws:s3:::cleverorc/pathfinder/allCreatures.json"
 
 functions:
-  s3SelectQuery:
+  monsterSearch:
     memorySize: 128
-    handler: src/shaefer/s3Select.query
+    handler: src/shaefer/monsterSearch.queryByCR
     events:
       - http:
-          path: shaefer/{id}
+          path: shaefer/cr/{crVal}/{operator}
           method: get
           cors: true

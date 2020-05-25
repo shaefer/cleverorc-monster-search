@@ -56,12 +56,15 @@ const s3SelectParamBuilder = (query) => {
   return s3SelectParams;
 }
 
-module.exports.query = async (event, context, callback) => {
-  console.log("Called s3Select")
-  const query = 'SELECT s.name FROM S3Object s WHERE s.crAsNum > 20';
+module.exports.queryByCR = async (event, context, callback) => {
+  console.log("Called s3Select");
+  const cr = event.pathParameters.crVal;
+  const operator = event.pathParameters.operator || '=';
+  const query = `SELECT s.name FROM S3Object s WHERE s.crAsNum ${operator} ${cr}`;
   const s3SelectParams = s3SelectParamBuilder(query);
   try {
     const data = await getS3Data(s3SelectParams);
+    console.log(`${data.length} monsters found`)
     context.succeed(data);
   } catch (error) {
     context.fail(error);
