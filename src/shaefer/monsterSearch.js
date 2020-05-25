@@ -59,8 +59,10 @@ const s3SelectParamBuilder = (query) => {
 module.exports.queryByCR = async (event, context, callback) => {
   console.log("Called s3Select");
   const cr = event.pathParameters.crVal;
-  const operator = event.pathParameters.operator || '=';
-  const query = `SELECT s.name FROM S3Object s WHERE s.crAsNum ${operator} ${cr}`;
+  const cr2 = event.pathParameters.crVal2;
+  const operator = event.pathParameters.operator || '='; //we may need to account for encoding and make a map
+  const compareOp = (operator === 'btw') ? `s.crAsNum > ${cr} and s.crAsNum < ${cr2}` : `s.crAsNum ${operator} ${cr}`;
+  const query = `SELECT * FROM S3Object s WHERE ${compareOp}`;
   const s3SelectParams = s3SelectParamBuilder(query);
   try {
     const data = await getS3Data(s3SelectParams);
@@ -69,5 +71,4 @@ module.exports.queryByCR = async (event, context, callback) => {
   } catch (error) {
     context.fail(error);
   }
-  
 };

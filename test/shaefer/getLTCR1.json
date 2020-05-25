@@ -1,0 +1,6 @@
+{
+    "pathParameters": {
+      "crVal": 1,
+      "operator": "<"
+    }
+}
