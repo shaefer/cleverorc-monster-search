@@ -26,3 +26,12 @@ If you are looking for a first-time guide to serverless and lambda's please chec
 
 https://docs.aws.amazon.com/AmazonS3/latest/API/API_SelectObjectContent.html
 https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-lambda-function.html
+
+
+## Gotchas (things to watch out for):
+1. I had forgotten to stringify the body of my response which causes an error (not in the lambda) but in the API Gateway layer which prevented any lambda logging from picking it up. 
+1. I tried to setup a path structure that had optional path parameters, but if you don't map those paths in serverless.yml as part of the function you won't get the appropriate api gateway mappings and you will get the very helpful error `internal server error` If you go into api gateway and run the same request you will get a better error `AWS lambda api gateway error “Malformed Lambda proxy response”` which points to the problem and allowed [Stack Overflow](https://stackoverflow.com/a/44702461/1310765) to save the day again.
+
+## Resources
+1. [AWS Lambda Function Definitions](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-lambda-function.html) (helpful for making specific changes to the lambda config)
+1. [S3 Reference](https://docs.aws.amazon.com/AmazonS3/latest/API/API_SelectObjectContent.html) for `SelectObjectContent` which is the call we make when using s3Select (but just uses permissions `getObject`)

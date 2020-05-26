@@ -57,7 +57,7 @@ const s3SelectParamBuilder = (query) => {
 }
 
 const mapOperators = (op) => {
-  const operator = op.toLowerCase();
+  const operator = (op) ? op.toLowerCase() : op;
   const ops = {
     gte: '>=',
     lte: '<=',
@@ -83,6 +83,25 @@ const http500 = (error) => {
   return response;
 }
 
+const decodeURIPathParameters = (param) => {
+  if (!param) return ''; //decodeURI(undefined) returns the string 'undefined' which is very distressing. Same for null. 
+  try {
+    return decodeURIComponent(param);
+  } catch (e) {
+    return '';
+  }
+}
+
+const convertCRToDecimal = (cr) => {
+  const decoded = decodeURIComponent(cr);
+  if (decoded === '1/2') return 0.5;
+  if (decoded === '1/3') return "cast(0.33 as FLOAT)"; //trying to match these is causing weird bugs probably due to some opaque type casting...
+  if (decoded === '1/4') return 0.25;
+  if (decoded === '1/6') return "cast(0.166 as FLOAT)";
+  if (decoded === '1/8') return "cast(0.125 as FLOAT)";
+  return decoded;
+}
+
 /**
  * /monsterSearch/cr/{crVal1}/{operator(optional)}/{crVal2(optional)}
  * crVal2 is only used for operator btw
@@ -91,14 +110,14 @@ const http500 = (error) => {
  */
 module.exports.queryByCR = async (event, context, callback) => {
   console.log("Called s3Select");
-  const cr = event.pathParameters.crVal; //TODO: Validate Path Params
-  const cr2 = event.pathParameters.crVal2;
-  const operator = mapOperators(event.pathParameters.operator); //we may need to account for encoding and make a map
+  const cr = convertCRToDecimal(event.pathParameters.crVal); //TODO: Validate Path Params
+  const cr2 = convertCRToDecimal(event.pathParameters.crVal2);
+  const operator = mapOperators(decodeURIPathParameters(event.pathParameters.operator)); //we may need to account for encoding and make a map
 
   (operator === 'btw') ? console.log(`URI: /cr/${cr}/${operator}/${cr2}`) : console.log(`URI: /cr/${cr}/${operator}`);
 
   const compareOp = (operator === 'btw') ? `s.crAsNum >= ${cr} and s.crAsNum <= ${cr2}` : `s.crAsNum ${operator} ${cr}`;
-  const query = `SELECT s.name, s.cr, s.alignment, s.environment, s.creature_type, s.creature_subtype FROM S3Object s WHERE ${compareOp}`;
+  const query = `SELECT s.name, s.cr, s.crAsNum, s.alignment, s.environment, s.creature_type, s.creature_subtype FROM S3Object s WHERE ${compareOp}`;
   const s3SelectParams = s3SelectParamBuilder(query);
   try {
     const data = await getS3Data(s3SelectParams);

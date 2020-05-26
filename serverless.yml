@@ -21,3 +21,11 @@ functions:
           path: api/monsters/cr/{crVal}/{operator}/{crVal2}
           method: get
           cors: true
+      - http:
+          path: api/monsters/cr/{crVal}/{operator}
+          method: get
+          cors: true
+      - http:
+          path: api/monsters/cr/{crVal}
+          method: get
+          cors: true
