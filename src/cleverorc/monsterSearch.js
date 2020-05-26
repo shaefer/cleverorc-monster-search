@@ -89,8 +89,16 @@ module.exports.queryByCR = async (event, context, callback) => {
   try {
     const data = await getS3Data(s3SelectParams);
     console.log(`${data.length} monsters found`)
-    context.succeed(data);
+    const response = {
+      statusCode: '200',
+      body: JSON.stringify(data),
+    };
+    callback(null, response);
   } catch (error) {
-    context.fail(error);
+    const response = {
+      statusCode: '500',
+      body: error,
+    };
+    callback(null, response);
   }
 };

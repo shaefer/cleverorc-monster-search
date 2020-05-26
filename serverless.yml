@@ -15,9 +15,9 @@ provider:
 functions:
   monsterSearch:
     memorySize: 128
-    handler: src/shaefer/monsterSearch.queryByCR
+    handler: src/cleverorc/monsterSearch.queryByCR
     events:
       - http:
-          path: shaefer/cr/{crVal}/{operator}/{crVal2}
+          path: api/monsters/cr/{crVal}/{operator}/{crVal2}
           method: get
           cors: true
