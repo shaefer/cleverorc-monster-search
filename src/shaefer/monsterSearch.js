@@ -56,13 +56,35 @@ const s3SelectParamBuilder = (query) => {
   return s3SelectParams;
 }
 
+const mapOperators = (operator) => {
+  const ops = {
+    gte: '>=',
+    lte: '<=',
+    lt: '<',
+    gt: '>',
+    eq: '='
+  }
+  return ops[operator] || operator || '=';
+}
+
+  /**
+   * /monsterSearch/cr/{crVal1}/{operator(optional)}/{crVal2(optional)}
+   * crVal2 is only used for operator btw
+   * operators: <(lt), >(gt), >=(gte), <=(lte), =(eq), btw
+   * btw is always inclusive
+   */
 module.exports.queryByCR = async (event, context, callback) => {
   console.log("Called s3Select");
   const cr = event.pathParameters.crVal;
   const cr2 = event.pathParameters.crVal2;
-  const operator = event.pathParameters.operator || '='; //we may need to account for encoding and make a map
-  const compareOp = (operator === 'btw') ? `s.crAsNum > ${cr} and s.crAsNum < ${cr2}` : `s.crAsNum ${operator} ${cr}`;
-  const query = `SELECT * FROM S3Object s WHERE ${compareOp}`;
+  const operator = mapOperators(event.pathParameters.operator); //we may need to account for encoding and make a map
+  if (operator === 'btw') {
+    console.log(`URI: /cr/${cr}/${operator}/${cr2}`);
+  } else {
+    console.log(`URI: /cr/${cr}/${operator}`);
+  }
+  const compareOp = (operator === 'btw') ? `s.crAsNum >= ${cr} and s.crAsNum <= ${cr2}` : `s.crAsNum ${operator} ${cr}`;
+  const query = `SELECT s.name, s.cr, s.alignment, s.environment, s.creature_type, s.creature_subtype FROM S3Object s WHERE ${compareOp}`;
   const s3SelectParams = s3SelectParamBuilder(query);
   try {
     const data = await getS3Data(s3SelectParams);

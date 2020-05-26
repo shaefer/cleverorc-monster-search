@@ -1,7 +1,7 @@
 {
     "pathParameters": {
-      "crVal": 1,
+      "crVal": 17,
       "operator": "btw",
-      "crVal2": 3
+      "crVal2": 19
     }
 }
