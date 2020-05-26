@@ -18,6 +18,6 @@ functions:
     handler: src/shaefer/monsterSearch.queryByCR
     events:
       - http:
-          path: shaefer/cr/{crVal}/{operator}/${crVal2}
+          path: shaefer/cr/{crVal}/{operator}/{crVal2}
           method: get
           cors: true
