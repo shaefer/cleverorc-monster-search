@@ -91,10 +91,10 @@ const http500 = (error) => {
  */
 module.exports.queryByCR = async (event, context, callback) => {
   console.log("Called s3Select");
-  const cr = event.pathParameters.crVal;
+  const cr = event.pathParameters.crVal; //TODO: Validate Path Params
   const cr2 = event.pathParameters.crVal2;
   const operator = mapOperators(event.pathParameters.operator); //we may need to account for encoding and make a map
-  
+
   (operator === 'btw') ? console.log(`URI: /cr/${cr}/${operator}/${cr2}`) : console.log(`URI: /cr/${cr}/${operator}`);
 
   const compareOp = (operator === 'btw') ? `s.crAsNum >= ${cr} and s.crAsNum <= ${cr2}` : `s.crAsNum ${operator} ${cr}`;
@@ -103,7 +103,8 @@ module.exports.queryByCR = async (event, context, callback) => {
   try {
     const data = await getS3Data(s3SelectParams);
     console.log(`${data.length} monsters found`);
-    callback(null, http200(data));
+    //TODO: Add meta data to object...like number of results, and what was queried
+    callback(null, http200(data)); //API Gateway expects a stringified body back otherwise you'll get an internal error after the lambda is processed.
   } catch (error) {
     callback(null, http500(error));
   }
