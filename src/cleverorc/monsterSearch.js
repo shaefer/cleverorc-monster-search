@@ -67,12 +67,27 @@ const mapOperators = (operator) => {
   return ops[operator] || operator || '=';
 }
 
-  /**
-   * /monsterSearch/cr/{crVal1}/{operator(optional)}/{crVal2(optional)}
-   * crVal2 is only used for operator btw
-   * operators: <(lt), >(gt), >=(gte), <=(lte), =(eq), btw
-   * btw is always inclusive
-   */
+const http200 = (data) => {
+  const response = {
+    statusCode: '200',
+    body: JSON.stringify(data),
+  };
+  return response;
+}
+const http500 = (error) => {
+  const response = {
+    statusCode: '500',
+    body: error,
+  };
+  return response;
+}
+
+/**
+ * /monsterSearch/cr/{crVal1}/{operator(optional)}/{crVal2(optional)}
+ * crVal2 is only used for operator btw
+ * operators: <(lt), >(gt), >=(gte), <=(lte), =(eq), btw
+ * btw is always inclusive
+ */
 module.exports.queryByCR = async (event, context, callback) => {
   console.log("Called s3Select");
   const cr = event.pathParameters.crVal;
@@ -88,17 +103,9 @@ module.exports.queryByCR = async (event, context, callback) => {
   const s3SelectParams = s3SelectParamBuilder(query);
   try {
     const data = await getS3Data(s3SelectParams);
-    console.log(`${data.length} monsters found`)
-    const response = {
-      statusCode: '200',
-      body: JSON.stringify(data),
-    };
-    callback(null, response);
+    console.log(`${data.length} monsters found`);
+    callback(null, http200(data));
   } catch (error) {
-    const response = {
-      statusCode: '500',
-      body: error,
-    };
-    callback(null, response);
+    callback(null, http500(error));
   }
 };
