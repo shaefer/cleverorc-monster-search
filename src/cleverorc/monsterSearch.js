@@ -39,7 +39,7 @@ const getS3Data = async (params) => {
 const s3SelectParamBuilder = (query) => {
   const s3SelectParams = {
     Bucket: 'cleverorc',
-    Key: 'pathfinder/allCreatures.json',
+    Key: 'pathfinder/allMonsters.json',
     ExpressionType: 'SQL',
     Expression: query,
     InputSerialization: {
@@ -109,21 +109,25 @@ const convertCRToDecimal = (cr) => {
  * btw is always inclusive
  */
 module.exports.queryByCR = async (event, context, callback) => {
-  console.log("Called s3Select");
   const cr = convertCRToDecimal(event.pathParameters.crVal); //TODO: Validate Path Params
   const cr2 = convertCRToDecimal(event.pathParameters.crVal2);
   const operator = mapOperators(decodeURIPathParameters(event.pathParameters.operator)); //we may need to account for encoding and make a map
 
-  (operator === 'btw') ? console.log(`URI: /cr/${cr}/${operator}/${cr2}`) : console.log(`URI: /cr/${cr}/${operator}`);
+  const uri = (operator === 'btw') ? `/cr/${cr}/${operator}/${cr2}` : `/cr/${cr}/${operator}`;
 
   const compareOp = (operator === 'btw') ? `s.crAsNum >= ${cr} and s.crAsNum <= ${cr2}` : `s.crAsNum ${operator} ${cr}`;
-  const query = `SELECT s.name, s.cr, s.crAsNum, s.alignment, s.environment, s.creature_type, s.creature_subtype FROM S3Object s WHERE ${compareOp}`;
+  const query = `SELECT s.name, s.cr, s.crAsNum, s.alignment, s.environment, s.creature_type, s.creature_subtype, s.ability_scores FROM S3Object s WHERE ${compareOp}`;
   const s3SelectParams = s3SelectParamBuilder(query);
   try {
     const data = await getS3Data(s3SelectParams);
-    console.log(`${data.length} monsters found`);
     //TODO: Add meta data to object...like number of results, and what was queried
-    callback(null, http200(data)); //API Gateway expects a stringified body back otherwise you'll get an internal error after the lambda is processed.
+    console.log(`Data retrieved for: ${uri}`)
+    const fullData = {
+      monsterCount: data.length,
+      uri,
+      results: data
+    }
+    callback(null, http200(fullData)); //API Gateway expects a stringified body back otherwise you'll get an internal error after the lambda is processed.
   } catch (error) {
     callback(null, http500(error));
   }

@@ -10,7 +10,7 @@ provider:
     - Effect: Allow
       Action:
         - s3:GetObject
-      Resource: "arn:aws:s3:::cleverorc/pathfinder/allCreatures.json"
+      Resource: "arn:aws:s3:::cleverorc/pathfinder/allMonsters.json"
 
 functions:
   monsterSearch:
