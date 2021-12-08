@@ -35,3 +35,19 @@ https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-lamb
 ## Resources
 1. [AWS Lambda Function Definitions](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-lambda-function.html) (helpful for making specific changes to the lambda config)
 1. [S3 Reference](https://docs.aws.amazon.com/AmazonS3/latest/API/API_SelectObjectContent.html) for `SelectObjectContent` which is the call we make when using s3Select (but just uses permissions `getObject`)
+
+
+## Refresher
+This project makes it easy to build and deploy a simple serverless api using lambda and api gateway. 
+
+### The parts
+1. There is a source data file in s3...it isn't created as part of this project. 
+1. It creates the api gateway which will have a url which is discoverable by going to the deployed stage: https://amazonapigatewayuri/apigatewaystage/api/monsters/cr/13/btw/15
+1. The serverless.yml file defines the uri as well as the path to the s3 bucket with the raw data.
+1. The function name is not part of the uri...it more like the name of the API domain. 
+    1. What is important is the handler `handler: src/cleverorc/monsterSearch.queryByCR` it is the name of the .js file and the method that will be executed from lambda. 
+    2. In this case `src/monsterSearch.js` and the function `queryByCR` (which you should notice is formed like a lambda...because it is) 
+1. The next part of the uri is the stage (the api gateway stage-used for deployment stages like dev, test, or prod). Then the defined paths in serverless.yml
+
+
+
